@@ -93,7 +93,33 @@ public class AccountServiceImpl implements IAccountService {
             });
         });*/
 
-        return repository.save(account);
+        return customerMono.doOnNext(c1 -> {
+        }).flatMap(c -> {
+            return productMono.doOnNext(p -> {
+                // Acá poner restricciones para producto (Opcional)
+                if(p.getType().equalsIgnoreCase("fixed term") && c.getType().equalsIgnoreCase("Business")) {
+                    throw new RuntimeException("The business client cannot have a fixed-term account");
+                }
+                else if(p.getType().equalsIgnoreCase("saving") && c.getType().equalsIgnoreCase("Business")) {
+                    throw new RuntimeException("The business customer cannot have a savings account");
+                }
+            }).flatMap(p2 -> {
+                return accountMono.doOnNext(a -> {
+
+
+                }).flatMap(am -> {
+                    return getProduct(am.getProductId()).doOnNext( ap -> {
+                        if(c.getType().equalsIgnoreCase("Personal"))
+                            throw new RuntimeException("El cliente Personal ya cuenta con ese producto de tipo cuenta " + ap.getType());
+                        else if(c.getType().equalsIgnoreCase("Business"))
+                            throw new RuntimeException("El cliente Business ya cuenta con ese producto de tipo cuenta " + ap.getType());
+                    }).flatMap(pa -> {
+                        return repository.save(account);
+                    });
+
+                }).switchIfEmpty(repository.save(account));
+            });
+        });
 
     }
 
