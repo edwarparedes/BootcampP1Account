@@ -3,6 +3,7 @@ package com.nttdata.account.service;
 import com.nttdata.account.entity.Account;
 import com.nttdata.account.model.Customer;
 import com.nttdata.account.model.Product;
+import com.nttdata.account.model.Transaction;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +23,10 @@ public interface IAccountService {
 
     Mono<Product> getProduct(String productId);
 
+    Mono<Account> checkBalance(String accountNumber);
 
+    Flux<Transaction> getTransactions(String accountId);
+
+    Flux<Transaction> getTransactions2(String customerId, String productId);
 
 }

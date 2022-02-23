@@ -3,6 +3,7 @@ package com.nttdata.account.controller;
 import com.nttdata.account.entity.Account;
 import com.nttdata.account.model.Customer;
 import com.nttdata.account.model.Product;
+import com.nttdata.account.model.Transaction;
 import com.nttdata.account.service.IAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,21 @@ public class AccountController {
     @GetMapping("/product/{productId}")
     public Mono<Product> getProduct(@PathVariable("productId") String productId){
         return service.getProduct(productId);
+    }
+
+    @GetMapping("/checkbalance/{accountNumber}")
+    public Mono<Account> checkBalance(@PathVariable("accountNumber") String accountNumber){
+        return service.checkBalance(accountNumber);
+    }
+
+    @GetMapping("/transactions/{accountId}")
+    public Flux<Transaction> getTransactions(@PathVariable("accountId") String accountId){
+        return service.getTransactions(accountId);
+    }
+
+    @GetMapping("/transactions2/{customerId}/{productId}")
+    public Flux<Transaction> getTransactions2(@PathVariable("customerId") String customerId, @PathVariable("productId") String productId){
+        return service.getTransactions2(customerId, productId);
     }
 
 

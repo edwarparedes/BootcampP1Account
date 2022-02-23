@@ -10,4 +10,6 @@ public interface IAccountRepository extends ReactiveMongoRepository<Account, Str
 
     Mono<Account> findByCustomerIdAndProductId(String customerId, String productId);
 
+    Mono<Account> findByAccountNumber(String accountNumber);
 }
+

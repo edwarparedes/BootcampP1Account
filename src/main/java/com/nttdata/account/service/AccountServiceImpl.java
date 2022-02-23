@@ -3,6 +3,7 @@ package com.nttdata.account.service;
 import com.nttdata.account.entity.Account;
 import com.nttdata.account.model.Customer;
 import com.nttdata.account.model.Product;
+import com.nttdata.account.model.Transaction;
 import com.nttdata.account.repository.IAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Service
 public class AccountServiceImpl implements IAccountService {
@@ -32,6 +35,8 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public Mono<Account> save(Account account) {
+
+        account.setCreationTime(LocalDateTime.now());
         Mono<Account> accountMono = repository.findByCustomerIdAndProductId(account.getCustomerId(), account.getProductId());
         Mono<Customer> customerMono = getCustomer(account.getCustomerId());
         Mono<Product> productMono = getProduct(account.getProductId());
@@ -155,4 +160,31 @@ public class AccountServiceImpl implements IAccountService {
         return productMono;
     }
 
+    @Override
+    public Mono<Account> checkBalance(String accountNumber) {
+        return repository.findByAccountNumber(accountNumber);
+    }
+
+
+    @Override
+    public Flux<Transaction> getTransactions(String accountId) {
+        Flux<Transaction> transactionFlux = webClientBuilder.build()
+                .get()
+                .uri("http://localhost:8004/transaction/gettransactionsbyaccount/{accountId}", accountId)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToFlux(Transaction.class);
+        return transactionFlux;
+    }
+
+    @Override
+    public Flux<Transaction> getTransactions2(String customerId, String productId) {
+        return getAll().filter(a -> {
+            return a.getCustomerId().equalsIgnoreCase(customerId);
+        }).filter(b -> {
+            return b.getProductId().equalsIgnoreCase(productId);
+        }).flatMap(c -> {
+            return getTransactions(c.getId());
+        });
+    }
 }
