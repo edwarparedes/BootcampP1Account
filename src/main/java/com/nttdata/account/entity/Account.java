@@ -5,9 +5,7 @@ import com.nttdata.account.model.Signatory;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -19,8 +17,7 @@ public class Account {
     private Double maintenanceFee;
     private int movementLimit;
     private Double balance;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date date;
+    private LocalDateTime creationTime;
 
     List<Holder> holders;//titulares
     List<Signatory> signatories;// firmantes
